@@ -1,0 +1,24 @@
+name: Check and package
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m venv .venv
+      - run: .\.venv\Scripts\python.exe -m pip install -r requirements-windows.lock
+      - run: .\.venv\Scripts\python.exe -m pip install --no-deps -e .
+      - run: .\scripts\build.ps1
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatScout-Windows
+          path: dist/ChatScout-Windows.zip
